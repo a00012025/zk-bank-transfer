@@ -1,9 +1,10 @@
 import { bytesToBigInt, fromHex } from "@zk-email/helpers/dist/binaryFormat";
 import { generateCircuitInputs } from "@zk-email/helpers/dist/input-helpers";
 
-export const STRING_PRESELECTOR = "<td>=E8=BD=89=E5=B8=B3=E9=87=91=E9=A1=8D";
+export const STRING_PRESELECTOR =
+  "=e8=\r\n=bd=89=e5=b8=b3=e9=87=91=e9=a1=8d</td>=0a=09=09<td>=0a=09=09=09=09=09=09=e8=\r\n=87=ba=e5=b9=a3=20";
 export const MAX_HEADER_PADDED_BYTES = 1024; // NOTE: this must be the same as the first arg in the email in main args circom
-export const MAX_BODY_PADDED_BYTES = 1536; // NOTE: this must be the same as the arg to sha the remainder number of bytes in the email in main args circom
+export const MAX_BODY_PADDED_BYTES = 15360; // NOTE: this must be the same as the arg to sha the remainder number of bytes in the email in main args circom
 
 export type IBankTransferCircuitInputs = ReturnType<
   typeof generateBankTransferVerifierCircuitInputs
@@ -23,7 +24,6 @@ export function generateBankTransferVerifierCircuitInputs({
   rsaSignature: BigInt;
   rsaPublicKey: BigInt;
   ethereumAddress: string;
-  transfer_amount_idx: string;
 }) {
   const emailVerifierInputs = generateCircuitInputs({
     rsaSignature,
@@ -41,14 +41,9 @@ export function generateBankTransferVerifierCircuitInputs({
   ); // Char array to Uint8Array
   const selectorBuffer = Buffer.from(STRING_PRESELECTOR);
 
-  let currentIndex =
+  const transfer_amount_idx =
     Buffer.from(bodyRemaining).indexOf(selectorBuffer) + selectorBuffer.length;
   // search "<td>" starting from after currentIndex
-  currentIndex = Buffer.from(bodyRemaining).indexOf(
-    Buffer.from("<td>"),
-    currentIndex
-  );
-  const transfer_amount_idx = currentIndex + 4;
 
   const address = bytesToBigInt(fromHex(ethereumAddress)).toString();
 
