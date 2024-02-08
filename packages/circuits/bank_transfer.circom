@@ -2,14 +2,14 @@ pragma circom 2.1.5;
 
 include "@zk-email/zk-regex-circom/circuits/common/from_addr_regex.circom";
 include "@zk-email/circuits/email-verifier.circom";
-include "./components/twitter_reset_regex.circom";
+include "./components/mega_transfer_regex.circom";
 
 // Here, n and k are the biginteger parameters for RSA
 // This is because the number is chunked into k pack_size of n bits each
 // Max header bytes shouldn't need to be changed much per email,
 // but the max mody bytes may need to be changed to be larger if the email has a lot of i.e. HTML formatting
 // TODO: split into header and body
-template TwitterVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, expose_from, expose_to) {
+template MegaTransferVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, expose_from, expose_to) {
     assert(expose_from < 2); // 1 if we should expose the from, 0 if we should not
     assert(expose_to == 0); // 1 if we should expose the to, 0 if we should not: due to hotmail restrictions, we force-disable this
 
@@ -88,4 +88,4 @@ template TwitterVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, expo
 // * pack_size = 31 is the number of bytes that can fit into a 255ish bit signal (can increase later)
 // * expose_from = 0 is whether to expose the from email address
 // * expose_to = 0 is whether to expose the to email (not recommended)
-component main { public [ address ] } = TwitterVerifier(1024, 1536, 121, 17, 31, 0, 0);
+component main { public [ address ] } = MegaTransferVerifier(1024, 1536, 121, 17, 31, 0, 0);

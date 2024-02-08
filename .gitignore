@@ -74,3 +74,5 @@ tsbuildinfo
 tsconfig.tsbuildinfo
 lib
 es
+
+*.eml
