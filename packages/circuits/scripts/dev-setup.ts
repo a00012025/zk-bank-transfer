@@ -136,14 +136,14 @@ async function exec() {
   // Create artifacts directory and copy build files
   fs.mkdirSync(path.join(BUILD_DIR, "artifacts"), { recursive: true });
 
-  fs.copyFileSync(
-    path.join(BUILD_DIR, `${CIRCUIT_NAME}.r1cs`),
-    path.join(ARTIFACTS_DIR, `${CIRCUIT_NAME}.r1cs`)
-  );
-  fs.copyFileSync(
-    path.join(BUILD_DIR, `${CIRCUIT_NAME}_js/${CIRCUIT_NAME}.wasm`),
-    path.join(ARTIFACTS_DIR, `${CIRCUIT_NAME}.wasm`)
-  );
+  // fs.copyFileSync(
+  //   path.join(BUILD_DIR, `${CIRCUIT_NAME}.r1cs`),
+  //   path.join(ARTIFACTS_DIR, `${CIRCUIT_NAME}.r1cs`)
+  // );
+  // fs.copyFileSync(
+  //   path.join(BUILD_DIR, `${CIRCUIT_NAME}_js/${CIRCUIT_NAME}.wasm`),
+  //   path.join(ARTIFACTS_DIR, `${CIRCUIT_NAME}.wasm`)
+  // );
 
   const zKeyPath = path.join(BUILD_DIR, `${CIRCUIT_NAME}.zkey`);
 
