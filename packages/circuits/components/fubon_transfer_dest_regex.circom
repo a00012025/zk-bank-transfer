@@ -3,7 +3,7 @@ pragma circom 2.1.5;
 include "@zk-email/zk-regex-circom/circuits/regex_helpers.circom";
 
 // regex: =e8=bd=89=e5=85=a5=e5=b8=b3=e8=99=9f</td>=0a=09=09=09=09<td>=0a=09=09=09([0-9][0-9][0-9])=\r\n\(=[0-9a-f][0-9a-f]=[0-9a-f][0-9a-f]=[0-9a-f][0-9a-f]=[0-9a-f][0-9a-f]=[0-9a-f][0-9a-f]=[0-9a-f][0-9a-f]=[0-9a-f][0-9a-f]=[0-9a-f][0-9a-f]=[0-9a-f][0-9a-f]=[0-9a-f][0-9a-f]=[0-9a-f][0-9a-f]=[0-9a-f][0-9a-f]\)-([0-9][0-9][0-9][0-9][0-9][0-9]\*\*\*\*[0-9][0-9][0-9][0-9][0-9][0-9])
-template Test(msg_bytes) {
+template FubonTransferDestRegex(msg_bytes) {
 	signal input msg[msg_bytes];
 	signal output out;
 
