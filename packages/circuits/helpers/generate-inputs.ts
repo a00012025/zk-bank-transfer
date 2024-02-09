@@ -4,7 +4,7 @@ import { generateCircuitInputs } from "@zk-email/helpers/dist/input-helpers";
 export const STRING_PRESELECTOR =
   "=e8=\r\n=bd=89=e5=b8=b3=e9=87=91=e9=a1=8d</td>=0a=09=09<td>=0a=09=09=09=09=09=09=e8=\r\n=87=ba=e5=b9=a3=20";
 export const MAX_HEADER_PADDED_BYTES = 1024; // NOTE: this must be the same as the first arg in the email in main args circom
-export const MAX_BODY_PADDED_BYTES = 15360; // NOTE: this must be the same as the arg to sha the remainder number of bytes in the email in main args circom
+export const MAX_BODY_PADDED_BYTES = 14500; // NOTE: this must be the same as the arg to sha the remainder number of bytes in the email in main args circom
 
 export type IBankTransferCircuitInputs = ReturnType<
   typeof generateBankTransferVerifierCircuitInputs

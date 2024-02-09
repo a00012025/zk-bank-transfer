@@ -82,10 +82,10 @@ template FubonTransferVerifier(max_header_bytes, max_body_bytes, n, k, pack_size
 // TODO: Update deployed contract and zkey to reflect this number, as it the currently deployed contract uses 7
 // Args:
 // * max_header_bytes = 1024 is the max number of bytes in the header
-// * max_body_bytes = 15360 is the max number of bytes in the body after precomputed slice
+// * max_body_bytes = 14500 is the max number of bytes in the body after precomputed slice
 // * n = 121 is the number of bits in each chunk of the pubkey (RSA parameter)
 // * k = 17 is the number of chunks in the pubkey (RSA parameter). Note 121 * 17 > 2048.
 // * pack_size = 31 is the number of bytes that can fit into a 255ish bit signal (can increase later)
 // * expose_from = 0 is whether to expose the from email address
 // * expose_to = 0 is whether to expose the to email (not recommended)
-component main { public [ address ] } = FubonTransferVerifier(1024, 15360, 121, 17, 31, 0, 0);
+component main { public [ address ] } = FubonTransferVerifier(1024, 14500, 121, 17, 31, 0, 0);
