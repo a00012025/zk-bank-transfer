@@ -151,8 +151,12 @@ async function exec() {
     PHASE1_PATH,
     circuitPath,
     zKeyPath,
-    path.join(ARTIFACTS_DIR, `${CIRCUIT_NAME}.vkey.json`),
+    path.join(BUILD_DIR, `${CIRCUIT_NAME}.vkey.json`),
     SOLIDITY_VERIFIER_PATH
+  );
+  fs.copyFileSync(
+    path.join(BUILD_DIR, `${CIRCUIT_NAME}.vkey.json`),
+    path.join(ARTIFACTS_DIR, `${CIRCUIT_NAME}.vkey.json`)
   );
   log("✓ zkey, vkey and Solidity verifier generated");
 
