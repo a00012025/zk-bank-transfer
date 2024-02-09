@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "mkdir -p build && circom bank_transfer.circom -l ../../node_modules -l ./node_modules --wasm --r1cs --sym -o ./build",
+    "build": "mkdir -p build && circom bank_transfer.circom -l ../../node_modules -l ./node_modules --O1 --c --sym --r1cs -o ./build",
     "generate-regex": "zk-regex decomposed -d ./components/fubon_transfer.json -c ./components/fubon_transfer_regex.circom -t FubonTransferRegex -g true",
     "test": "NODE_OPTIONS=--max_old_space_size=16384 jest"
   },
