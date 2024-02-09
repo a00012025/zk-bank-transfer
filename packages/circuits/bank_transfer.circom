@@ -3,6 +3,7 @@ pragma circom 2.1.5;
 include "@zk-email/zk-regex-circom/circuits/common/from_addr_regex.circom";
 include "@zk-email/circuits/email-verifier.circom";
 include "./components/fubon_transfer_regex.circom";
+include "./components/fubon_transfer_dest_regex.circom";
 
 // Here, n and k are the biginteger parameters for RSA
 // This is because the number is chunked into k pack_size of n bits each
@@ -58,15 +59,13 @@ template FubonTransferVerifier(max_header_bytes, max_body_bytes, n, k, pack_size
     }
 
 
-    // Body reveal vars
+    // Body reveal vars: Amount
     var max_amount_len = 12;
     var max_amount_packed_bytes = count_packed(max_amount_len, pack_size); // ceil(max_num_bytes / 7)
     signal input transfer_amount_idx;
     signal output reveal_amount_packed[max_amount_packed_bytes];
 
     // AMOUNT REGEX: 328,044 constraints
-    // This computes the regex states on each character in the email body. For new emails, this is the
-    // section that you want to swap out via using the zk-regex library.
     signal (amount_regex_out, amount_regex_reveal[max_body_bytes]) <== FubonTransferRegex(max_body_bytes)(in_body_padded);
     // This ensures we found a match at least once (i.e. match count is not zero)
     signal is_found_amount <== IsZero()(amount_regex_out);
@@ -74,6 +73,24 @@ template FubonTransferVerifier(max_header_bytes, max_body_bytes, n, k, pack_size
 
     // PACKING: 16,800 constraints (Total: 3,115,057)
     reveal_amount_packed <== ShiftAndPackMaskedStr(max_body_bytes, max_amount_len, pack_size)(amount_regex_reveal, transfer_amount_idx);
+
+    // Body reveal vars: Bank ID and Bank Account
+    var max_bank_id_len = 3;
+    var max_bank_account_len = 16;
+    signal input bank_id_idx;
+    signal output reveal_bank_id_packed[1];
+    signal input bank_account_idx;
+    signal output reveal_bank_account_packed[1];
+
+    // BANK ID AND ACCOUNT REGEX: ??? constraints
+    signal (transfer_dest_regex_out, bank_id_regex_reveal[max_body_bytes], bank_account_regex_reveal[max_body_bytes]) <== FubonTransferDestRegex(max_body_bytes)(in_body_padded);
+    // This ensures we found a match at least once (i.e. match count is not zero)
+    signal is_found_transfer_dest <== IsZero()(transfer_dest_regex_out);
+    is_found_transfer_dest === 0;
+
+    // PACKING: ??? constraints
+    reveal_bank_id_packed <== ShiftAndPackMaskedStr(max_body_bytes, max_bank_id_len, pack_size)(bank_id_regex_reveal, bank_id_idx);
+    reveal_bank_account_packed <== ShiftAndPackMaskedStr(max_body_bytes, max_bank_account_len, pack_size)(bank_account_regex_reveal, bank_account_idx);
 }
 
 // In circom, all output signals of the main component are public (and cannot be made private), the input signals of the main component are private if not stated otherwise using the keyword public as above. The rest of signals are all private and cannot be made public.

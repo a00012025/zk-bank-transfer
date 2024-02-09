@@ -3,6 +3,8 @@ import { generateCircuitInputs } from "@zk-email/helpers/dist/input-helpers";
 
 export const STRING_PRESELECTOR =
   "=e8=\r\n=bd=89=e5=b8=b3=e9=87=91=e9=a1=8d</td>=0a=09=09<td>=0a=09=09=09=09=09=09=e8=\r\n=87=ba=e5=b9=a3=20";
+const BANK_ID_PREFIX =
+  "=e8=bd=89=e5=85=a5=e5=b8=b3=e8=99=9f</td>=0a=09=09=09=09<td>=0a=09=09=09";
 export const MAX_HEADER_PADDED_BYTES = 1024; // NOTE: this must be the same as the first arg in the email in main args circom
 export const MAX_BODY_PADDED_BYTES = 14528; // NOTE: this must be the same as the arg to sha the remainder number of bytes in the email in main args circom
 
@@ -43,13 +45,19 @@ export function generateBankTransferVerifierCircuitInputs({
 
   const transfer_amount_idx =
     Buffer.from(bodyRemaining).indexOf(selectorBuffer) + selectorBuffer.length;
-  // search "<td>" starting from after currentIndex
+
+  const bank_id_idx =
+    Buffer.from(bodyRemaining).indexOf(BANK_ID_PREFIX, selectorBuffer.length) +
+    BANK_ID_PREFIX.length;
+  const bank_account_idx = bank_id_idx + 45;
 
   const address = bytesToBigInt(fromHex(ethereumAddress)).toString();
 
   return {
     ...emailVerifierInputs,
     transfer_amount_idx,
+    bank_id_idx,
+    bank_account_idx,
     address,
   };
 }
