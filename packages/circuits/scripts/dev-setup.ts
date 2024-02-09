@@ -31,8 +31,8 @@ if (ZKEY_BEACON == null) {
 const CIRCUIT_NAME = "bank_transfer";
 const BUILD_DIR = path.join(__dirname, "../build");
 const PHASE1_URL =
-  "https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_22.ptau";
-const PHASE1_PATH = path.join(BUILD_DIR, "powersOfTau28_hez_final_22.ptau");
+  "https://hermez.s3-eu-west-1.amazonaws.com/powersOfTau28_hez_final_24.ptau";
+const PHASE1_PATH = path.join(BUILD_DIR, "powersOfTau28_hez_final_24.ptau");
 const ARTIFACTS_DIR = path.join(BUILD_DIR, "artifacts");
 const SOLIDITY_TEMPLATE = path.join(
   require.resolve("snarkjs"),
