@@ -3,30 +3,40 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@zk-email/contracts/DKIMRegistry.sol";
 import "@zk-email/contracts/utils/StringUtils.sol";
 import {Groth16Verifier} from "./Verifier.sol";
 
-contract ProofOfBankTransfer {
-    using StringUtils for *;
-
+contract OTCByBankTransfer is Ownable {
     uint16 public constant bytesInPackedBytes = 31;
     string constant domain = "dfm.taipeifubon.com.tw";
 
     uint32 public constant pubKeyHashIndexInSignal = 0; // index of DKIM public key hash in signals array
     uint32 public constant amountIndexInSignal = 1; // index of packed transfer amount in signals array
-    uint32 public constant addressIndexInSignal = 2; // index of ethereum address in signals array
+    uint32 public constant bankIdIndexInSignal = 2; // index of hashed bank id in signals array
+    uint32 public constant bankAccountIndexInSignal = 3; // index of hashed bank account in signals array
+    uint32 public constant emailNullifierIndexInSignal = 4; // index of email nullifier in signals array
+    uint32 public constant addressIndexInSignal = 5; // index of ethereum address in signals array
 
     DKIMRegistry dkimRegistry;
     Groth16Verifier public immutable verifier;
-
-    mapping(address => uint256) public addressToAmount;
+    ERC20 public immutable USDT;
+    // rate times 1000
+    uint256 public usdtToTwdRate;
 
     event AmountProved(address indexed sender, uint256 amount);
 
-    constructor(Groth16Verifier v, DKIMRegistry d) {
+    constructor(Groth16Verifier v, DKIMRegistry d, address usdt) {
         verifier = v;
         dkimRegistry = d;
+        USDT = ERC20(usdt);
+        usdtToTwdRate = 31_788;
+    }
+
+    // set usdt rate
+    function setUsdtToTwdRate(uint256 rate) public onlyOwner {
+        usdtToTwdRate = rate;
     }
 
     /// Prove the amount transfer from bank
@@ -58,6 +68,14 @@ contract ProofOfBankTransfer {
             "Invalid Proof"
         );
 
+        // Verify bank id and account
+        // TODO: add hashed bank id and account
+        require(signals[bankIdIndexInSignal] == 1234, "Invalid bank id");
+        require(
+            signals[bankAccountIndexInSignal] == 1234,
+            "Invalid bank account"
+        );
+
         // Extract the amount chunks from the signals.
         uint256[] memory amountPacked = new uint256[](1);
         amountPacked[0] = signals[amountIndexInSignal];
@@ -67,7 +85,11 @@ contract ProofOfBankTransfer {
             bytesInPackedBytes
         );
         uint256 amount = StringUtils.stringToUint(amountStr);
-        addressToAmount[msg.sender] += amount;
         emit AmountProved(msg.sender, amount);
+
+        // calculate USDT to send
+        uint256 usdtToSend = (amount * 1000 * 10 ** (USDT.decimals())) /
+            usdtToTwdRate;
+        USDT.transfer(msg.sender, usdtToSend);
     }
 }
