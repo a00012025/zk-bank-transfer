@@ -23,8 +23,11 @@ contract Deploy is Script, Test {
         uint256 sk = getPrivateKey();
         vm.startBroadcast(sk);
 
-        Verifier proofVerifier = new Verifier();
-        console.log("Deployed Verifier at address: %s", address(proofVerifier));
+        Groth16Verifier proofVerifier = new Groth16Verifier();
+        console.log(
+            "Deployed Groth16Verifier at address: %s",
+            address(proofVerifier)
+        );
 
         DKIMRegistry dkimRegistry = new DKIMRegistry();
         console.log(

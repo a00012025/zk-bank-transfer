@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@zk-email/contracts/DKIMRegistry.sol";
 import "@zk-email/contracts/utils/StringUtils.sol";
-import {Verifier} from "./Verifier.sol";
+import {Groth16Verifier} from "./Verifier.sol";
 
 contract ProofOfBankTransfer {
     using StringUtils for *;
@@ -18,13 +18,13 @@ contract ProofOfBankTransfer {
     uint32 public constant addressIndexInSignals = 2; // index of ethereum address in signals array
 
     DKIMRegistry dkimRegistry;
-    Verifier public immutable verifier;
+    Groth16Verifier public immutable verifier;
 
     mapping(address => uint256) public addressToAmount;
 
     event AmountProved(address indexed sender, uint256 amount);
 
-    constructor(Verifier v, DKIMRegistry d) {
+    constructor(Groth16Verifier v, DKIMRegistry d) {
         verifier = v;
         dkimRegistry = d;
     }
@@ -32,7 +32,7 @@ contract ProofOfBankTransfer {
     /// Prove the amount transfer from bank
     /// @param proof ZK proof of the circuit - a[2], b[4] and c[2] encoded in series
     /// @param signals Public signals of the circuit. First item is pubkey_hash, next is amount, the last one is etherum address
-    function prove(uint256[8] memory proof, uint256[3] memory signals) public {
+    function prove(uint256[8] memory proof, uint256[5] memory signals) public {
         // Checks: Verify proof and check signals
         // public signals are the masked packed message bytes, and hash of public key.
         // Verify the DKIM public key hash stored on-chain matches the one used in circuit

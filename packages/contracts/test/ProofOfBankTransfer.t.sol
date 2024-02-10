@@ -12,14 +12,14 @@ contract TwitterUtilsTest is Test {
 
     address constant VM_ADDR = 0x7109709ECfa91a80626fF3989D68f67F5b1DD12D; // Hardcoded address of the VM from foundry
 
-    Verifier proofVerifier;
+    Groth16Verifier proofVerifier;
     DKIMRegistry dkimRegistry;
     ProofOfBankTransfer testVerifier;
 
     uint16 public constant packSize = 7;
 
     function setUp() public {
-        proofVerifier = new Verifier();
+        proofVerifier = new Groth16Verifier();
         dkimRegistry = new DKIMRegistry();
 
         // These are the Poseidon hash of DKIM public keys for domain
@@ -39,12 +39,14 @@ contract TwitterUtilsTest is Test {
     // These proof and public input values are generated using scripts in packages/circuits/scripts/generate-proof.ts
     // The sample email in `/emls` is used as the input, but you will have different values if you generated your own zkeys
     function testVerifyTestEmail() public {
-        uint256[3] memory publicSignals;
+        uint256[5] memory publicSignals;
         publicSignals[
             0
         ] = 8521093304904949094417505179913007927512696611747706107671813586064928938549;
         publicSignals[1] = 52983524766513;
         publicSignals[2] = 51410588117056328271986241639848257252558396979;
+        publicSignals[3] = 51410588117056328271986241639848257252558396979;
+        publicSignals[4] = 51410588117056328271986241639848257252558396979;
 
         uint256[2] memory proof_a = [
             8560515785464264484566975251793601340764569587346456836887462574095272861109,
