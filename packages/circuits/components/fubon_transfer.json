@@ -2,7 +2,7 @@
   "parts": [
     {
       "is_public": false,
-      "regex_def": "=e5=b9=a3=20"
+      "regex_def": "=a3=20"
     },
     {
       "is_public": true,
