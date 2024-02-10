@@ -29,6 +29,7 @@ template FubonTransferVerifier(max_header_bytes, max_body_bytes, n, k, pack_size
     signal input in_body_len_padded_bytes;
 
     signal output pubkey_hash;
+    signal header_hash[256] <== EV.sha;
 
     component EV = EmailVerifier(max_header_bytes, max_body_bytes, n, k, 0);
     EV.in_padded <== in_padded;
