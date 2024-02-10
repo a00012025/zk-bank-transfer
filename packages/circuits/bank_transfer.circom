@@ -65,7 +65,7 @@ template FubonTransferVerifier(max_header_bytes, max_body_bytes, n, k, pack_size
     signal input transfer_amount_idx;
     signal output reveal_amount_packed[max_amount_packed_bytes];
 
-    // AMOUNT REGEX: 328,044 constraints
+    // AMOUNT REGEX: ??? constraints
     signal (amount_regex_out, amount_regex_reveal[max_body_bytes]) <== FubonTransferRegex(max_body_bytes)(in_body_padded);
     // This ensures we found a match at least once (i.e. match count is not zero)
     signal is_found_amount <== IsZero()(amount_regex_out);
