@@ -4,12 +4,13 @@ include "@zk-email/zk-regex-circom/circuits/common/from_addr_regex.circom";
 include "@zk-email/circuits/email-verifier.circom";
 include "./components/fubon_transfer_regex.circom";
 include "./components/fubon_transfer_dest_regex.circom";
+include "./utils/hash_sign_gen_rand.circom";
+include "./utils/email_nullifier.circom";
 
 // Here, n and k are the biginteger parameters for RSA
 // This is because the number is chunked into k pack_size of n bits each
 // Max header bytes shouldn't need to be changed much per email,
 // but the max mody bytes may need to be changed to be larger if the email has a lot of i.e. HTML formatting
-// TODO: split into header and body
 template FubonTransferVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, expose_from, expose_to) {
     assert(expose_from < 2); // 1 if we should expose the from, 0 if we should not
     assert(expose_to == 0); // 1 if we should expose the to, 0 if we should not: due to hotmail restrictions, we force-disable this
@@ -41,7 +42,6 @@ template FubonTransferVerifier(max_header_bytes, max_body_bytes, n, k, pack_size
 
     pubkey_hash <== EV.pubkey_hash;
 
-
     // FROM HEADER REGEX: 736,553 constraints
     // This extracts the from email, and the precise regex format can be viewed in the README
     if(expose_from){
@@ -57,7 +57,6 @@ template FubonTransferVerifier(max_header_bytes, max_body_bytes, n, k, pack_size
         from_regex_out === 1;
         reveal_email_from_packed <== ShiftAndPackMaskedStr(max_header_bytes, max_email_from_len, pack_size)(from_regex_reveal, email_from_idx);
     }
-
 
     // Body reveal vars: Amount
     var max_amount_len = 12;
@@ -78,19 +77,32 @@ template FubonTransferVerifier(max_header_bytes, max_body_bytes, n, k, pack_size
     var max_bank_id_len = 3;
     var max_bank_account_len = 16;
     signal input bank_id_idx;
-    signal output reveal_bank_id_packed[1];
     signal input bank_account_idx;
-    signal output reveal_bank_account_packed[1];
+    signal bank_id_packed[1];
+    signal bank_account_packed[1];
 
-    // BANK ID AND ACCOUNT REGEX: ??? constraints
+    // TRANSFER REGEX: ??? constraints
     signal (transfer_dest_regex_out, bank_id_regex_reveal[max_body_bytes], bank_account_regex_reveal[max_body_bytes]) <== FubonTransferDestRegex(max_body_bytes)(in_body_padded);
     // This ensures we found a match at least once (i.e. match count is not zero)
     signal is_found_transfer_dest <== IsZero()(transfer_dest_regex_out);
     is_found_transfer_dest === 0;
 
     // PACKING: ??? constraints
-    reveal_bank_id_packed <== ShiftAndPackMaskedStr(max_body_bytes, max_bank_id_len, pack_size)(bank_id_regex_reveal, bank_id_idx);
-    reveal_bank_account_packed <== ShiftAndPackMaskedStr(max_body_bytes, max_bank_account_len, pack_size)(bank_account_regex_reveal, bank_account_idx);
+    bank_id_packed <== ShiftAndPackMaskedStr(max_body_bytes, max_bank_id_len, pack_size)(bank_id_regex_reveal, bank_id_idx);
+    bank_account_packed <== ShiftAndPackMaskedStr(max_body_bytes, max_bank_account_len, pack_size)(bank_account_regex_reveal, bank_account_idx);
+
+    // HASH BANK ID AND ACCOUNT: ??? constraints
+    component bank_id_hash = Poseidon(1);
+    bank_id_hash.inputs[0] <== bank_id_packed[0];
+    signal output reveal_bank_id_hashed <== bank_id_hash.out;
+    component bank_account_hash = Poseidon(1);
+    bank_account_hash.inputs[0] <== bank_account_packed[0];
+    signal output reveal_bank_account_hashed <== bank_account_hash.out;
+
+    // NULLIFIER: ??? constraints
+    signal output email_nullifier;
+    signal cm_rand <== HashSignGenRand(n, k)(signature);
+    email_nullifier <== EmailNullifier()(header_hash, cm_rand);
 }
 
 // In circom, all output signals of the main component are public (and cannot be made private), the input signals of the main component are private if not stated otherwise using the keyword public as above. The rest of signals are all private and cannot be made public.
